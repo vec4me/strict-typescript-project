@@ -8,6 +8,8 @@
 		"resolveJsonModule": true,
 		"isolatedModules": true,
 		"noEmit": true,
+		"jsx": "preserve",
+		"jsxImportSource": "solid-js",
 		"strict": true,
 		"skipLibCheck": true,
 		"allowSyntheticDefaultImports": true,
@@ -21,8 +23,12 @@
 		"useUnknownInCatchVariables": true,
 		"verbatimModuleSyntax": true,
 		"noErrorTruncation": true,
-		"noUncheckedSideEffectImports": true
+		"noUncheckedSideEffectImports": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"allowUnreachableCode": false,
+		"allowUnusedLabels": false
 	},
 	"include": ["**/*", "../shared/**/*"],
-	"exclude": ["_*"]
+	"exclude": ["_*", "node_modules", "../dist"]
 }

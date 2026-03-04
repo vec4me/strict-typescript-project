@@ -49,7 +49,9 @@ interface Schema {
 
 const response = await fetch(schemaUrl);
 if (!response.ok) {
-	throw new Error(`Failed to fetch biome schema: ${response.status} ${response.statusText}`);
+	throw new Error(
+		`Failed to fetch biome schema: ${response.status} ${response.statusText}`,
+	);
 }
 const schema: Schema = await response.json();
 
@@ -103,7 +105,7 @@ const config = {
 		useIgnoreFile: true,
 	},
 	files: {
-		includes: ["**", "!!**/dist", "!!backend/_generated"],
+		includes: ["**", "!!**/dist", "!!**/_*"],
 	},
 	formatter: {
 		enabled: true,
