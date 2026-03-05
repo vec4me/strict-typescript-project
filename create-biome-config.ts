@@ -27,6 +27,7 @@ const off = new Set([
 	"nursery/noContinue",
 	"nursery/noExcessiveLinesPerFile",
 	"nursery/noJsxLiterals",
+	"style/noJsxLiterals",
 	"nursery/noJsxPropsBind",
 	"nursery/noTernary",
 	"style/noNestedTernary",
