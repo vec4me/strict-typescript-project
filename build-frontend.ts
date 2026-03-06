@@ -1,4 +1,4 @@
-import { copyFileSync, existsSync, mkdirSync, readFileSync } from "node:fs";
+import { copyFileSync, cpSync, existsSync, mkdirSync, readFileSync } from "node:fs";
 import { gzipSync } from "node:zlib";
 import { type BuildOptions, build, context } from "esbuild";
 import { solidPlugin } from "esbuild-plugin-solid";
@@ -7,6 +7,7 @@ const isWatch = process.argv.includes("--watch");
 
 mkdirSync("dist/", { recursive: true });
 copyFileSync("frontend/index.html", "dist/index.html");
+cpSync("public/", "dist/", { recursive: true });
 
 const config: BuildOptions = {
 	entryPoints: ["frontend/main.tsx"],
