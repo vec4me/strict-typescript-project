@@ -8,9 +8,10 @@ cp scripts/tsconfig.json backend/tsconfig.json
 cp scripts/knip.ts knip.ts
 cp scripts/convex.json convex.json
 cp scripts/biome-rules.grit biome-rules.grit
+cp scripts/stylelint.config.js stylelint.config.js
 cp scripts/gitignore .gitignore
 mkdir --parents public
-echo '/* /index.html 200' > public/_redirects
+echo '/* /index.html 200' >| public/_redirects
 
 npx tsx scripts/create-biome-config.ts
 

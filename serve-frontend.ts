@@ -1,8 +1,13 @@
+import { watch } from "node:fs";
 import { createServer } from "node:http";
 import { context } from "esbuild";
 import { config, setupDist } from "./frontend-config.ts";
 
 setupDist();
+
+watch("frontend/", { recursive: true }, () => setupDist());
+watch("public/", { recursive: true }, () => setupDist());
+watch("shared/", { recursive: true }, () => setupDist());
 
 const ctx = await context(config);
 await ctx.watch();
