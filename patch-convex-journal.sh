@@ -1,4 +1,4 @@
-set -o errexit -o nounset -o pipefail
+set -o errexit -o nounset -o pipefail -o noclobber
 
 TARGET="node_modules/convex/bin/main.js"
 

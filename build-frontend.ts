@@ -1,55 +1,17 @@
-import {
-	copyFileSync,
-	cpSync,
-	existsSync,
-	mkdirSync,
-	readFileSync,
-} from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { gzipSync } from "node:zlib";
-import { type BuildOptions, build, context } from "esbuild";
-import { solidPlugin } from "esbuild-plugin-solid";
+import { build } from "esbuild";
+import { config, setupDist } from "./frontend-config.ts";
 
-const isWatch = process.argv.includes("--watch");
+setupDist();
+await build(config);
 
-mkdirSync("dist/", { recursive: true });
-copyFileSync("frontend/index.html", "dist/index.html");
-cpSync("public/", "dist/", { recursive: true });
-
-const config: BuildOptions = {
-	entryPoints: ["frontend/main.tsx"],
-	bundle: true,
-	outdir: "dist/",
-	format: "esm",
-	platform: "browser",
-	target: "es2020",
-	plugins: [solidPlugin()],
-	loader: { ".css": "css" },
-	minify: true,
-	logLevel: "warning",
-	drop: ["console", "debugger"],
-	legalComments: "none",
-	define: {
-		"process.env.NODE_ENV": JSON.stringify("production"),
-		"import.meta.env.CONVEX_URL": JSON.stringify(process.env.CONVEX_URL ?? ""),
-	},
-};
-
-if (isWatch) {
-	const ctx = await context(config);
-	await ctx.watch();
-	await ctx.serve({ servedir: "dist/", port: 3000 });
-	console.log("Serving at http://localhost:3000");
+const js = readFileSync("dist/main.js");
+const jsSize = (gzipSync(js).length / 1024).toFixed(1);
+if (existsSync("dist/main.css")) {
+	const css = readFileSync("dist/main.css");
+	const cssSize = (gzipSync(css).length / 1024).toFixed(1);
+	console.log(`  gzip: ${jsSize}kb JS, ${cssSize}kb CSS`);
 } else {
-	await build(config);
-
-	// Show gzipped sizes
-	const js = readFileSync("dist/main.js");
-	const jsSize = (gzipSync(js).length / 1024).toFixed(1);
-	if (existsSync("dist/main.css")) {
-		const css = readFileSync("dist/main.css");
-		const cssSize = (gzipSync(css).length / 1024).toFixed(1);
-		console.log(`  gzip: ${jsSize}kb JS, ${cssSize}kb CSS`);
-	} else {
-		console.log(`  gzip: ${jsSize}kb JS`);
-	}
+	console.log(`  gzip: ${jsSize}kb JS`);
 }
