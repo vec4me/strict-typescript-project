@@ -153,7 +153,7 @@ const config = {
 		enabled: true,
 		actions: {
 			source: {
-				organizeImports: "on",
+				organizeImports: "off",
 			},
 		},
 	},
