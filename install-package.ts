@@ -17,17 +17,17 @@ const template = {
 		postinstall: "bash scripts/install-configs-and-patch.sh",
 	},
 	dependencies: {
-		"convex": "^1.32.0",
+		convex: "^1.32.0",
 		"solid-js": "^1.9.11",
 	},
 	devDependencies: {
 		"@biomejs/biome": "^2.4.5",
 		"@types/node": "^25.3.3",
-		"esbuild": "^0.25.0",
+		esbuild: "^0.25.0",
 		"esbuild-plugin-solid": "^0.6.0",
-		"knip": "^5.85.0",
-		"tsx": "^4.19.0",
-		"typescript": "^5.9.3",
+		knip: "^5.85.0",
+		tsx: "^4.19.0",
+		typescript: "^5.9.3",
 	},
 };
 
