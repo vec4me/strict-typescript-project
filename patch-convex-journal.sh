@@ -7,7 +7,7 @@ if [[ ! -f "$TARGET" ]]; then
 	exit 0
 fi
 
-if grep --quiet "JOURNAL_PATCHED" "$TARGET"; then
+if grep -q "JOURNAL_PATCHED" "$TARGET"; then
 	exit 0
 fi
 
