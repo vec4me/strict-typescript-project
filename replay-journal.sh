@@ -1,6 +1,7 @@
 set -o errexit -o nounset -o pipefail -o noclobber
 
 JOURNAL_DIR=".journal/"
+mkdir -p "$JOURNAL_DIR"
 PENDING=$(find "$JOURNAL_DIR" -maxdepth 1 -name "*.pending.json" 2>/dev/null | sort)
 
 if [[ -z "$PENDING" ]]; then
