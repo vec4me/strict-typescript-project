@@ -3,6 +3,5 @@ node_modules/
 backend/_generated/
 backend/README.md
 .journal/
-.jobnavi-scheduling-tool/
 android/
 ios/

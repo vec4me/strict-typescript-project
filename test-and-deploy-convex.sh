@@ -10,5 +10,5 @@ bash "$DIR/replay-journal.sh"
 # doesn't work that way.
 export CONVEX_DEPLOYMENT="${CONVEX_DEPLOYMENT_PROD}"
 npx convex deploy --yes
-npx tsx "$DIR/build-frontend.ts"
+npx vite build
 npx wrangler pages deploy .dist/ --project-name="$(node --print "require('./package.json').name")" --commit-dirty=true

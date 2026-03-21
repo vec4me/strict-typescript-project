@@ -1,4 +1,4 @@
-import { readFileSync, readdirSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { dirname, relative } from "node:path";
 
 // When this file runs from its source dir, scriptsDir is correct.
@@ -50,7 +50,13 @@ const config: Record<string, unknown> = {
 		] as string[]
 	).concat(toolEntries),
 	project: ["**/*.ts", "**/*.tsx"],
-	ignoreDependencies: ["@biomejs/biome", "tailwindcss", "tsx"],
+	ignoreDependencies: [
+		"@biomejs/biome",
+		"tailwindcss",
+		"@capacitor/android",
+		"@capacitor/ios",
+		"@capacitor/assets",
+	],
 	ignore: ["**/*.d.ts", "backend/schema.ts"],
 	rules: {
 		files: "error",

@@ -10,6 +10,7 @@ cp "$DIR/tsconfig.json" backend/tsconfig.json
 cp "$DIR/knip.ts" knip.ts
 cp "$DIR/convex.json" convex.json
 cp "$DIR/biome-rules.grit" biome-rules.grit
+cp "$DIR/vite.config.ts" vite.config.ts
 cp "$DIR/gitignore" .gitignore
 mkdir -p public
 echo '/* /index.html 200' >| public/_redirects

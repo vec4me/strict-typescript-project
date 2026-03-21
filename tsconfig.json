@@ -11,12 +11,13 @@
 		"jsx": "preserve",
 		"jsxImportSource": "solid-js",
 		"strict": true,
+		"types": ["node", "vite/client"],
 		"skipLibCheck": true,
 		"allowSyntheticDefaultImports": true,
 		"forceConsistentCasingInFileNames": true,
 		"noUncheckedIndexedAccess": true,
 		"exactOptionalPropertyTypes": true,
-		"noPropertyAccessFromIndexSignature": true,
+		"noPropertyAccessFromIndexSignature": false,
 		"noImplicitReturns": true,
 		"noFallthroughCasesInSwitch": true,
 		"noImplicitOverride": true,
@@ -27,7 +28,8 @@
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
 		"allowUnreachableCode": false,
-		"allowUnusedLabels": false
+		"allowUnusedLabels": false,
+		"erasableSyntaxOnly": true
 	},
 	"include": ["**/*", "../shared/**/*"],
 	"exclude": [".*", "node_modules"]

@@ -1,6 +1,10 @@
+import { execSync } from "node:child_process";
 import { writeFileSync } from "node:fs";
 
-const schemaUrl = "https://biomejs.dev/schemas/2.4.7/schema.json";
+const version = execSync("npx biome --version", { encoding: "utf-8" })
+	.trim()
+	.replace("Version: ", "");
+const schemaUrl = `https://biomejs.dev/schemas/${version}/schema.json`;
 
 const off = new Set([
 	"a11y/noNoninteractiveElementInteractions",

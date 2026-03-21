@@ -24,8 +24,9 @@ const template = {
 	devDependencies: {
 		"@biomejs/biome": "^2.4.5",
 		"@types/node": "^25.3.3",
-		esbuild: "^0.25.0",
-		"esbuild-plugin-solid": "^0.6.0",
+		vite: "^6.3.0",
+		"vite-plugin-solid": "^2.11.0",
+		"@tailwindcss/vite": "^4.1.0",
 		knip: "^5.85.0",
 		tsx: "^4.19.0",
 		typescript: "^5.9.3",
