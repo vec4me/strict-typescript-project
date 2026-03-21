@@ -43,11 +43,7 @@ const toolEntries = readdirSync(".", { withFileTypes: true })
 
 const config: Record<string, unknown> = {
 	entry: (
-		[
-			"frontend/main.tsx",
-			"backend/_generated/api.d.ts",
-			`${scriptsDir}/*.ts`,
-		] as string[]
+		["backend/_generated/api.d.ts", `${scriptsDir}/*.ts`] as string[]
 	).concat(toolEntries),
 	project: ["**/*.ts", "**/*.tsx"],
 	ignoreDependencies: [

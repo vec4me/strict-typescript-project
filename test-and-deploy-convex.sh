@@ -9,6 +9,7 @@ bash "$DIR/replay-journal.sh"
 # prepend the environment variables to the command — for some reason it just
 # doesn't work that way.
 export CONVEX_DEPLOYMENT="${CONVEX_DEPLOYMENT_PROD}"
+export CONVEX_URL="https://${CONVEX_DEPLOYMENT_PROD#*:}.convex.cloud"
 npx convex deploy --yes
 npx vite build
 npx wrangler pages deploy .dist/ --project-name="$(node --print "require('./package.json').name")" --commit-dirty=true

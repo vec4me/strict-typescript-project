@@ -10,6 +10,7 @@ DIR="$(dirname "$0")"
 bash "$DIR/validate-code.sh"
 
 export CONVEX_DEPLOYMENT="${CONVEX_DEPLOYMENT_PROD}"
+export CONVEX_URL="https://${CONVEX_DEPLOYMENT_PROD#*:}.convex.cloud"
 npx vite build
 
 npx capacitor-assets generate --assetPath images --ios --android
