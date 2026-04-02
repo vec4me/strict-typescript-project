@@ -46,6 +46,7 @@ const off = new Set([
 	"nursery/useMaxParams",
 	"nursery/useSpread",
 	"style/useObjectSpread",
+	"nursery/useSortedClasses",
 ]);
 
 interface SchemaCategory {
@@ -114,7 +115,7 @@ const config = {
 		useIgnoreFile: true,
 	},
 	files: {
-		includes: ["**", "!**/convex/_generated/**"],
+		includes: ["**", "!**/_*"],
 	},
 	formatter: {
 		enabled: true,

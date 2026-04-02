@@ -26,6 +26,8 @@ for POINTER in $PENDING; do
 	# Copy bundled snapshot
 	cp -r "$JOURNAL_DIR$TS/" "$TEMP_DIR/backend/"
 
+	echo "  [$TS] deploying and running $FILE:$NAME ..."
+
 	# Deploy from snapshot
 	(cd "$TEMP_DIR" && CONVEX_DEPLOYMENT="${CONVEX_DEPLOYMENT_PROD}" npx convex deploy --yes)
 
@@ -35,5 +37,4 @@ for POINTER in $PENDING; do
 	# Mark as finished
 	mv "$POINTER" "$JOURNAL_DIR$TS.finished.json"
 	rm -rf "$TEMP_DIR/backend/"
-	echo "  $TS $FILE:$NAME"
 done

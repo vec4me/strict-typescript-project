@@ -11,5 +11,6 @@ rm -f .gitignore
 rm -f public/_redirects
 rm -f biome.json
 rm -f vite.config.ts
+rm -f eslint.config.js
 
 echo "Done."
