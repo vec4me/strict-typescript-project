@@ -13,8 +13,8 @@ const scriptsDir =
 	);
 
 const CORE_DIRS = new Set([
-	"frontend",
-	"backend",
+	"client",
+	"server",
 	"shared",
 	"public",
 	scriptsDir,
@@ -41,10 +41,10 @@ const toolEntries = readdirSync(".", { withFileTypes: true })
 	)
 	.map((d) => `${d.name}/**/*.ts`);
 
-const config: Record<string, unknown> = {
-	entry: (
-		["backend/_generated/api.d.ts", `${scriptsDir}/*.ts`] as string[]
-	).concat(toolEntries),
+const config = {
+	entry: ["server/_generated/api.d.ts", `${scriptsDir}/*.ts`].concat(
+		toolEntries,
+	),
 	project: ["**/*.ts", "**/*.tsx"],
 	ignoreDependencies: [
 		"@biomejs/biome",
@@ -53,7 +53,7 @@ const config: Record<string, unknown> = {
 		"@capacitor/ios",
 		"@capacitor/assets",
 	],
-	ignore: ["**/*.d.ts", "backend/schema.ts"],
+	ignore: ["**/*.d.ts", "server/schema.ts"],
 	rules: {
 		files: "error",
 		dependencies: "error",

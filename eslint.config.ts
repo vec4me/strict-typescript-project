@@ -1,13 +1,19 @@
 import tseslint from "typescript-eslint";
+import noConstantFunction from "./eslint-rules/no-constant-function.ts";
+import noCrossBoundaryImport from "./eslint-rules/no-cross-boundary-import.ts";
+import noDynamicRelativeImport from "./eslint-rules/no-dynamic-relative-import.ts";
+import noInlineStyle from "./eslint-rules/no-inline-style.ts";
+import noLinterIgnoreComments from "./eslint-rules/no-linter-ignore-comments.ts";
+import noSatisfies from "./eslint-rules/no-satisfies.ts";
 
-// Type-aware rules only — Biome handles all syntax-level linting.
+// Type-aware rules only -- Biome handles all syntax-level linting.
 // These rules require the TypeScript type checker, which Biome cannot access.
 export default tseslint.config(
 	{
-		ignores: ["**/_*/**"],
+		ignores: ["**/_*/**", "**/build/**", "**/ios/**", "**/android/**"],
 	},
 	{
-		files: ["frontend/**/*.{ts,tsx}", "backend/**/*.ts"],
+		files: ["client/**/*.{ts,tsx}", "server/**/*.ts"],
 		languageOptions: {
 			parser: tseslint.parser,
 			parserOptions: {
@@ -16,8 +22,24 @@ export default tseslint.config(
 		},
 		plugins: {
 			"@typescript-eslint": tseslint.plugin,
+			local: {
+				rules: {
+					"no-constant-function": noConstantFunction,
+					"no-cross-boundary-import": noCrossBoundaryImport,
+					"no-dynamic-relative-import": noDynamicRelativeImport,
+					"no-inline-style": noInlineStyle,
+					"no-linter-ignore-comments": noLinterIgnoreComments,
+					"no-satisfies": noSatisfies,
+				},
+			},
 		},
 		rules: {
+			"local/no-constant-function": "error",
+			"local/no-cross-boundary-import": "error",
+			"local/no-dynamic-relative-import": "error",
+			"local/no-inline-style": "off",
+			"local/no-linter-ignore-comments": "error",
+			"local/no-satisfies": "error",
 			// Unnecessary code (type-aware)
 			"@typescript-eslint/no-unnecessary-type-assertion": "error",
 			"@typescript-eslint/no-unnecessary-condition": "error",

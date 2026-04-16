@@ -24,7 +24,7 @@ for POINTER in $PENDING; do
 	NAME=$(node --print "require('./$POINTER').name")
 
 	# Copy bundled snapshot
-	cp -r "$JOURNAL_DIR$TS/" "$TEMP_DIR/backend/"
+	cp -r "$JOURNAL_DIR$TS/" "$TEMP_DIR/server/"
 
 	echo "  [$TS] deploying and running $FILE:$NAME ..."
 
@@ -36,5 +36,5 @@ for POINTER in $PENDING; do
 
 	# Mark as finished
 	mv "$POINTER" "$JOURNAL_DIR$TS.finished.json"
-	rm -rf "$TEMP_DIR/backend/"
+	rm -rf "$TEMP_DIR/server/"
 done

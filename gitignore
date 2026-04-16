@@ -1,7 +1,7 @@
 node_modules/
 .dist/
-backend/_generated/
-backend/README.md
+server/_generated/
+server/README.md
 .journal/
 android/
 ios/

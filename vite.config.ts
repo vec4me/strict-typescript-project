@@ -3,7 +3,7 @@ import { defineConfig } from "vite";
 import solid from "vite-plugin-solid";
 
 export default defineConfig({
-	root: "frontend",
+	root: "client",
 	publicDir: "../public",
 	envPrefix: "",
 	build: {

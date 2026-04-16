@@ -5,4 +5,4 @@ DIR="$(dirname "$0")"
 bash "$DIR/validate-code.sh"
 CONVEX_URL="https://${CONVEX_DEPLOYMENT_PROD#*:}.convex.cloud" npx vite build
 npx wrangler pages deploy .dist/ --project-name="$(node --print "require('./package.json').name")" --commit-dirty=true
-cd backend && flyctl deploy --now
+cd server && flyctl deploy --now

@@ -14,13 +14,13 @@ const ROOT = join(import.meta.dirname, "..");
 const printer = ts.createPrinter({ removeComments: true });
 const TRIVIAL_RHS = /^\w+$/u;
 
-interface Decl {
+type Decl = {
 	name: string;
 	key: string;
 	file: string;
 	line: number;
 	exported: boolean;
-}
+};
 
 function walk(dir: string): string[] {
 	const results: string[] = [];
@@ -54,7 +54,7 @@ function parse(path: string): ts.SourceFile {
 	);
 }
 
-// ── Canonical type representation (sorts unions, intersections, object members) ──
+// Canonical type representation (sorts unions, intersections, object members)
 
 function canonicalize(node: ts.Node, sf: ts.SourceFile): string {
 	if (ts.isUnionTypeNode(node)) {
@@ -112,7 +112,8 @@ function canonicalizeMember(m: ts.TypeElement, sf: ts.SourceFile): string {
 		)
 			? "readonly "
 			: "";
-		const name = m.name?.getText(sf) ?? "";
+		const rawName = m.name?.getText(sf);
+		const name = rawName === undefined ? "" : rawName;
 		const opt = m.questionToken ? "?" : "";
 		const type = m.type ? canonicalize(m.type, sf) : "unknown";
 		return `${readonly}${name}${opt}: ${type}`;
@@ -123,14 +124,15 @@ function canonicalizeMember(m: ts.TypeElement, sf: ts.SourceFile): string {
 function hasExportKeyword(
 	node: ts.TypeAliasDeclaration | ts.InterfaceDeclaration,
 ): boolean {
-	return (
-		node.modifiers?.some((m) => m.kind === ts.SyntaxKind.ExportKeyword) ?? false
-	);
+	if (node.modifiers === undefined) {
+		return false;
+	}
+	return node.modifiers.some((m) => m.kind === ts.SyntaxKind.ExportKeyword);
 }
 
-// ── Main ────────────────────────────────────────────────────────────────────
+// Main
 
-const files = ["shared", "backend", "frontend"].flatMap((d) =>
+const files = ["shared", "server", "client"].flatMap((d) =>
 	walk(join(ROOT, d)),
 );
 
@@ -177,7 +179,8 @@ let errors = 0;
 // Phase 2: detect duplicate type definitions across files
 const byKey = new Map<string, Decl[]>();
 for (const d of decls) {
-	const list = byKey.get(d.key) ?? [];
+	const existing = byKey.get(d.key);
+	const list = existing === undefined ? [] : existing;
 	list.push(d);
 	byKey.set(d.key, list);
 }
@@ -192,7 +195,10 @@ for (const [, group] of byKey) {
 	for (const d of exportedInGroup) {
 		console.log(`  ${d.name}  ${d.file}:${d.line}`);
 	}
-	console.log(`  canonical: ${group[0].key}\n`);
+	const first = group[0];
+	if (first !== undefined) {
+		console.log(`  canonical: ${first.key}\n`);
+	}
 	errors += 1;
 }
 
@@ -233,7 +239,7 @@ for (const file of files) {
 			if (alias) {
 				const pos = sf.getLineAndCharacterOfPosition(node.getStart(sf));
 				console.log(
-					`${rel}:${pos.line + 1}:${pos.character + 1} — use "${alias.name}" instead of "${node.getText(sf)}"`,
+					`${rel}:${pos.line + 1}:${pos.character + 1} -- use "${alias.name}" instead of "${node.getText(sf)}"`,
 				);
 				console.log(`  declared in ${alias.file}:${alias.line}\n`);
 				errors += 1;

@@ -33,10 +33,9 @@ or {
 		$type <: r"^[A-Z][a-zA-Z0-9]*$",
 		register_diagnostic(span=$decl, message="no-simple-type-alias: Don't rename types. Use the original type directly.")
 	},
-	// no-interface-extends (define explicit interfaces, don't inherit)
+	// no-interface (use type instead of interface)
 	TsInterfaceDeclaration() as $decl where {
-		$decl <: contains TsExtendsClause(),
-		register_diagnostic(span=$decl, message="no-interface-extends: Define explicit interfaces instead of using extends.")
+		register_diagnostic(span=$decl, message="no-interface: Use type instead of interface.")
 	},
 	// no-intersection-type (allows branded types: primitive & something)
 	TsIntersectionType() as $inter where {
@@ -73,5 +72,9 @@ or {
 			$ret <: contains `Required<`
 		},
 		register_diagnostic(span=$ret, message="no-utility-types: Avoid Omit/Pick/Partial/Required. Define explicit interfaces instead.")
+	},
+	// no-unknown-type (use explicit types instead)
+	TsUnknownType() as $t where {
+		register_diagnostic(span=$t, message="no-unknown-type: Avoid the unknown type. Use explicit types instead.")
 	}
 }

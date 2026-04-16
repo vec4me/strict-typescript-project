@@ -20,6 +20,7 @@ const off = new Set([
 	"correctness/noProcessGlobal",
 	"correctness/useImportExtensions",
 	"correctness/useImageSize",
+	"performance/noBarrelFile",
 	"performance/noImgElement",
 	"style/noDefaultExport",
 	"style/noExportedImports",
@@ -28,6 +29,7 @@ const off = new Set([
 	"security/noSecrets",
 	"style/useNamingConvention",
 	"style/useConsistentObjectDefinitions",
+	"style/useConsistentTypeDefinitions",
 	"style/useExportsLast",
 	"suspicious/noConsole",
 	"suspicious/noBitwiseOperators",
@@ -49,13 +51,13 @@ const off = new Set([
 	"nursery/useSortedClasses",
 ]);
 
-interface SchemaCategory {
-	properties: Record<string, unknown>;
-}
+type SchemaCategory = {
+	properties: Record<string, object>;
+};
 
-interface Schema {
+type Schema = {
 	$defs: Record<string, SchemaCategory>;
-}
+};
 
 const response = await fetch(schemaUrl);
 if (!response.ok) {
@@ -169,7 +171,9 @@ const config = {
 	},
 };
 
-function formatJson(obj: unknown, indent = 0): string {
+type JsonValue = string | number | boolean | null | object;
+
+function formatJson(obj: JsonValue, indent = 0): string {
 	const tab = "\t".repeat(indent);
 	const nextTab = "\t".repeat(indent + 1);
 
@@ -197,18 +201,15 @@ function formatJson(obj: unknown, indent = 0): string {
 		);
 		return `[\n${items.join(",\n")}\n${tab}]`;
 	}
-	if (typeof obj === "object") {
-		const entries = Object.entries(obj);
-		if (entries.length === 0) {
-			return "{}";
-		}
-		const items = entries.map(
-			([key, value]) =>
-				`${nextTab}${JSON.stringify(key)}: ${formatJson(value, indent + 1)}`,
-		);
-		return `{\n${items.join(",\n")}\n${tab}}`;
+	const entries = Object.entries(obj);
+	if (entries.length === 0) {
+		return "{}";
 	}
-	return String(obj);
+	const items = entries.map(
+		([key, value]) =>
+			`${nextTab}${JSON.stringify(key)}: ${formatJson(value, indent + 1)}`,
+	);
+	return `{\n${items.join(",\n")}\n${tab}}`;
 }
 
 writeFileSync("biome.json", `${formatJson(config)}\n`);
