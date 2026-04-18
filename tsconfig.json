@@ -31,6 +31,5 @@
 		"allowUnusedLabels": false,
 		"erasableSyntaxOnly": true
 	},
-	"include": ["**/*", "../shared/**/*"],
-	"exclude": [".*", "node_modules"]
+	"include": ["**/*", "../shared/**/*"]
 }

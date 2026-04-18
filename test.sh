@@ -5,7 +5,7 @@ failed=0
 npx biome check || failed=1
 npx tsc --noEmit --project client/tsconfig.json || failed=1
 npx tsc --noEmit --project server/tsconfig.json || failed=1
-npx eslint --ignore-pattern build/ || failed=1
+npx eslint --ignore-pattern build/ --ignore-pattern .journal/ || failed=1
 npx knip || failed=1
 npx tsx scripts/check-type-aliases.ts || failed=1
 
@@ -150,6 +150,16 @@ if grep -rn '=\{5,\}\|-\{5,\}' \
   failed=1
 fi
 
+# No --flag=value (use --flag value)
+if grep -rn -e '--[a-zA-Z][a-zA-Z0-9-]*=' \
+  --exclude-dir=node_modules \
+  --include='*.sh' \
+  . \
+  | grep -v 'test\.sh' ; then
+  echo 'ERROR: --flag=value found -- use --flag value'
+  failed=1
+fi
+
 # No non-ASCII characters (i18n.ts excluded)
 if LC_ALL=C grep -rn '[^ -~	]' \
   --exclude-dir=node_modules \
@@ -160,9 +170,23 @@ if LC_ALL=C grep -rn '[^ -~	]' \
   failed=1
 fi
 
-# No JS files -- prefer TypeScript
-if find . \( -name node_modules -o -name .journal -o -name .dist -o -name _generated -o -name convex -o -name ios -o -name android -o -name build \) -prune -o \( -name '*.js' -o -name '*.jsx' -o -name '*.mjs' -o -name '*.cjs' \) -print | grep .; then
-  echo 'ERROR: JavaScript file found -- use TypeScript instead'
+# Only allowed extensions
+if find . \( -name node_modules -o -name .journal -o -name web -o -name _generated -o -name convex -o -name ios -o -name android -o -name build -o -name .git -o -name .claude \) -prune -o -type f -print \
+  | grep -v '\.\(ts\|tsx\|sh\|json\|css\|html\|svg\|avif\|webp\|png\|txt\|grit\)$' \
+  | grep -v '/\.' \
+  | grep -v '_redirects$' \
+  | grep -v 'server/README\.md' \
+  | grep .; then
+  echo 'ERROR: file with disallowed extension found -- use .ts or .tsx for code'
+  failed=1
+fi
+
+# File names must be lowercase alphanumeric with hyphens only
+if find . \( -name node_modules -o -name .journal -o -name web -o -name _generated -o -name convex -o -name ios -o -name android -o -name build -o -name .git -o -name .claude \) -prune -o -type f -print \
+  | sed 's|.*/||' \
+  | grep -v '^[a-zA-Z0-9_][a-zA-Z0-9.-]*$' \
+  | grep -v '^\.' ; then
+  echo 'ERROR: file name must be lowercase alphanumeric with hyphens only'
   failed=1
 fi
 
@@ -195,6 +219,41 @@ if grep -rn '""' \
   | grep -v '= "";' \
   | grep -v '^[^:]*:[0-9]*:[[:space:]]*"",$' ; then
   echo 'ERROR: empty string literals found -- use null instead'
+  failed=1
+fi
+
+# global.css must disable text selection
+if ! grep -q 'user-select: none' client/global.css; then
+  echo 'ERROR: global.css must set user-select: none on body'
+  failed=1
+fi
+
+# global.css must disable iOS touch callout
+if ! grep -q -- '-webkit-touch-callout: none' client/global.css; then
+  echo 'ERROR: global.css must set -webkit-touch-callout: none on body'
+  failed=1
+fi
+
+# global.css must re-enable text selection on inputs
+if ! grep -q -- '-webkit-user-select: text' client/global.css; then
+  echo 'ERROR: global.css must re-enable user-select: text on input/textarea/contenteditable'
+  failed=1
+fi
+
+# global.css must block pinch-to-zoom
+if ! grep -q 'touch-action: pan-x pan-y' client/global.css; then
+  echo 'ERROR: global.css must set touch-action: pan-x pan-y to block pinch zoom'
+  failed=1
+fi
+
+# index.html must disable user scaling
+if ! grep -q 'user-scalable=no' client/index.html; then
+  echo 'ERROR: index.html viewport must include user-scalable=no'
+  failed=1
+fi
+
+if ! grep -q 'maximum-scale=1.0' client/index.html; then
+  echo 'ERROR: index.html viewport must include maximum-scale=1.0'
   failed=1
 fi
 

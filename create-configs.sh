@@ -12,15 +12,10 @@ cp "$DIR/convex.json" convex.json
 cp "$DIR/biome-rules.grit" biome-rules.grit
 cp "$DIR/vite.config.ts" vite.config.ts
 sed 's|"./eslint-rules/|"./scripts/eslint-rules/|' "$DIR/eslint.config.ts" >| eslint.config.ts
-cp "$DIR/gitignore" .gitignore
+cp "$DIR/gitignore.txt" .gitignore
 mkdir -p public
 echo '/* /index.html 200' >| public/_redirects
 
 npx tsx "$DIR/create-biome-config.ts"
-
-bash "$DIR/patch-convex-journal.sh"
-bash "$DIR/patch-convex-no-envfile.sh"
-bash "$DIR/patch-convex-access-token.sh"
-bash "$DIR/patch-vite-env-prefix.sh"
 
 echo "Done."

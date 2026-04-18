@@ -1,7 +1,5 @@
 set -o errexit -o nounset -o pipefail -o noclobber
 
-DIR="$(dirname "$0")"
-
 : "${CONVEX_DEPLOYMENT_PROD:?Missing}"
 
 XCODE_PLIST=$(defaults export com.apple.dt.Xcode - 2>/dev/null || true)
@@ -44,12 +42,13 @@ done
 
 security unlock-keychain ~/Library/Keychains/login.keychain-db
 
-bash "$DIR/validate-code.sh"
-
 export CONVEX_DEPLOYMENT="${CONVEX_DEPLOYMENT_PROD}"
 export CONVEX_URL="https://${CONVEX_DEPLOYMENT_PROD#*:}.convex.cloud"
 npx vite build
-npx capacitor-assets generate --assetPath images --ios
+
+rm -rf ios
+npx cap add ios
+npx capacitor-assets generate --assetPath public --ios
 npx cap sync ios
 
 CODE=$(date +%s)
@@ -64,7 +63,10 @@ xcodebuild archive \
   DEVELOPMENT_TEAM="$TEAM" \
   CODE_SIGN_STYLE=Automatic \
   MARKETING_VERSION="$VERSION" \
-  CURRENT_PROJECT_VERSION="$CODE"
+  CURRENT_PROJECT_VERSION="$CODE" \
+  DEAD_CODE_STRIPPING=YES \
+  STRIP_INSTALLED_PRODUCT=YES \
+  STRIP_STYLE=non-global
 
 cat >| build/ExportOptions.plist <<'PLIST'
 <?xml version="1.0" encoding="UTF-8"?>

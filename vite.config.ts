@@ -7,8 +7,9 @@ export default defineConfig({
 	publicDir: "../public",
 	envPrefix: "",
 	build: {
-		outDir: "../.dist",
+		outDir: "../web",
 		emptyOutDir: true,
+		sourcemap: false,
 	},
 	plugins: [solid(), tailwindcss()],
 });

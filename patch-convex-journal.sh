@@ -59,13 +59,13 @@ if (cmd === "run" && func) {
 	}
 }
 
-// Gate: block "dev --once" unless validate-code.sh passes
+// Gate: block "dev --once" unless test.sh passes
 if (cmd === "dev" && args.includes("--once")) {
 	const { execSync } = await import("node:child_process");
 	try {
-		execSync("bash scripts/validate-code.sh", { stdio: "inherit" });
+		execSync("bash scripts/test.sh", { stdio: "inherit" });
 	} catch {
-		console.error("\\n✖ validate-code.sh failed — fix errors before deploying");
+		console.error("\\n✖ test.sh failed — fix errors before deploying");
 		process.exit(1);
 	}
 }

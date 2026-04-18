@@ -1,7 +1,9 @@
 node_modules/
-.dist/
+web/
 server/_generated/
 server/README.md
 .journal/
 android/
 ios/
+.claude/
+build/

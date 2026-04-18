@@ -2,8 +2,7 @@ set -o errexit -o nounset -o pipefail -o noclobber
 
 DIR="$(dirname "$0")"
 
-CONVEX_DEPLOYMENT="${CONVEX_DEPLOYMENT_DEV}" npx convex dev --once --typecheck=enable
-bash "$DIR/validate-code.sh"
+CONVEX_DEPLOYMENT="${CONVEX_DEPLOYMENT_DEV}" npx convex dev --once --typecheck enable
 bash "$DIR/replay-journal.sh"
 # I have no fucking clue why this doesn't work without export, but you can't
 # prepend the environment variables to the command — for some reason it just
@@ -12,4 +11,4 @@ export CONVEX_DEPLOYMENT="${CONVEX_DEPLOYMENT_PROD}"
 export CONVEX_URL="https://${CONVEX_DEPLOYMENT_PROD#*:}.convex.cloud"
 npx convex deploy --yes
 npx vite build
-npx wrangler pages deploy .dist/ --project-name="$(node --print "require('./package.json').name")" --commit-dirty=true
+npx wrangler pages deploy web/ --project-name "$(node --print "require('./package.json').name")" --commit-dirty true

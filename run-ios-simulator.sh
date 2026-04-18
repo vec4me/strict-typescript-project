@@ -4,7 +4,7 @@ DIR="$(dirname "$0")"
 
 : "${CONVEX_DEPLOYMENT_PROD:?Missing}"
 
-bash "$DIR/validate-code.sh"
+bash "$DIR/test.sh"
 
 export CONVEX_DEPLOYMENT="${CONVEX_DEPLOYMENT_PROD}"
 export CONVEX_URL="https://${CONVEX_DEPLOYMENT_PROD#*:}.convex.cloud"

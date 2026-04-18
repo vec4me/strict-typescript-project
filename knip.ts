@@ -12,13 +12,7 @@ const scriptsDir =
 		)[1],
 	);
 
-const CORE_DIRS = new Set([
-	"client",
-	"server",
-	"shared",
-	"public",
-	scriptsDir,
-]);
+const CORE_DIRS = new Set(["client", "server", "shared", "public", scriptsDir]);
 
 function hasTypeScriptFiles(dir: string): boolean {
 	try {
@@ -49,7 +43,6 @@ const config = {
 	ignoreDependencies: [
 		"@biomejs/biome",
 		"tailwindcss",
-		"@capacitor/android",
 		"@capacitor/ios",
 		"@capacitor/assets",
 	],
