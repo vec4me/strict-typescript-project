@@ -31,5 +31,5 @@
 		"allowUnusedLabels": false,
 		"erasableSyntaxOnly": true
 	},
-	"include": ["**/*", "../shared/**/*"]
+	"include": ["**/*"]
 }

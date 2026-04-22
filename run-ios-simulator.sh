@@ -2,12 +2,8 @@ set -o errexit -o nounset -o pipefail -o noclobber
 
 DIR="$(dirname "$0")"
 
-: "${CONVEX_DEPLOYMENT_PROD:?Missing}"
-
 bash "$DIR/test.sh"
 
-export CONVEX_DEPLOYMENT="${CONVEX_DEPLOYMENT_PROD}"
-export CONVEX_URL="https://${CONVEX_DEPLOYMENT_PROD#*:}.convex.cloud"
 npx vite build
 npx cap sync ios
 

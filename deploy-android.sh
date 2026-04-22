@@ -1,14 +1,11 @@
 set -o errexit -o nounset -o pipefail -o noclobber
 
-: "${CONVEX_DEPLOYMENT_PROD:?Missing}"
 read -rsp "Keystore password: " KEYSTORE_PASSWORD
 echo
 
 export JAVA_HOME="$(brew --prefix openjdk@21)/libexec/openjdk.jdk/Contents/Home"
 export ANDROID_HOME="$(brew --prefix)/share/android-commandlinetools"
 
-export CONVEX_DEPLOYMENT="${CONVEX_DEPLOYMENT_PROD}"
-export CONVEX_URL="https://${CONVEX_DEPLOYMENT_PROD#*:}.convex.cloud"
 npx vite build
 
 rm -rf android

@@ -1,0 +1,327 @@
+SimpleJavaScript {
+  // A strict subset of TypeScript. If it's not here, it doesn't exist.
+
+  Program = Stmt*
+
+  // ── Statements ──────────────────────────────────────
+
+  Stmt = DeclareStmt
+       | ConstDecl | LetDecl | FunctionDecl | TypeDecl
+       | ImportStmt | ExportStmt
+       | ReturnStmt | IfStmt | SwitchStmt
+       | ForOfStmt | ForStmt
+       | TryStmt | ThrowStmt
+       | BreakStmt | ContinueStmt
+       | Block | ExprStmt
+
+  // ── Declarations ────────────────────────────────────
+
+  DeclareStmt = "declare" "module" string Block           -- module
+              | "declare" "const" name ":" Type          -- const
+              | "declare" Stmt                            -- other
+
+  ConstDecl = "const" Binding (":" Type)? "=" Expr ("," Binding (":" Type)? "=" Expr)*
+  LetDecl = "let" Binding "!" ~"=" (":" Type)? ("=" Expr)? ("," Binding (":" Type)? ("=" Expr)?)*  -- definite
+          | "let" Binding (":" Type)? ("=" Expr)? ("," Binding (":" Type)? ("=" Expr)?)*          -- normal
+  FunctionDecl = "async"? "function" name ParamList (":" Type)? Block
+  TypeDecl = "type" name "=" Type
+
+  // ── Parameters (no ?, no defaults) ──────────────────
+
+  ParamList = "(" ListOf<Param, ","> ","? ")"
+  Param = "..."? Binding (":" Type)?
+
+  // ── Imports / Exports ───────────────────────────────
+
+  ImportStmt = "import" "type"? ImportClause "from" string  -- named
+             | "import" string                               -- side_effect
+
+  ImportClause = name "," NamedImports  -- default_and_named
+               | NamedImports           -- named
+               | "*" "as" name          -- namespace
+               | name                   -- default
+
+  NamedImports = "{" ListOf<ImportSpec, ","> ","? "}"
+  ImportSpec = "type"? name ("as" name)?
+
+  ExportStmt = "export" "default" FunctionDecl  -- default_func
+             | "export" "default" Expr          -- default_expr
+             | "export" "type"? "{" ListOf<ExportSpec, ","> ","? "}" ("from" string)?  -- named
+             | "export" Stmt                    -- decl
+
+  ExportSpec = name ("as" name)?
+
+  // ── Statements ──────────────────────────────────────
+
+  Block = "{" Stmt* "}"
+  ExprStmt = Expr
+  ReturnStmt = "return" Expr?  -- with_expr
+  ThrowStmt = "throw" Expr
+  BreakStmt = "break" name?
+  ContinueStmt = "continue" name?
+
+  IfStmt = "if" "(" Expr ")" Block ("else" (IfStmt | Block))?
+
+  SwitchStmt = "switch" "(" Expr ")" "{" CaseClause* "}"
+  CaseClause = "case" Expr ":" Stmt*  -- case
+             | "default" ":" Stmt*    -- default
+
+  ForStmt = "for" "(" (ConstDecl | LetDecl | Expr)? ";" Expr? ";" Expr? ")" Block
+  ForOfStmt = "for" "(" ("const" | "let") Binding "of" Expr ")" Block
+
+  TryStmt = "try" Block CatchClause? FinallyClause?
+  CatchClause = "catch" ("(" name (":" Type)? ")")? Block
+  FinallyClause = "finally" Block
+
+  // ── Expressions ─────────────────────────────────────
+
+  Expr = Assignment
+
+  Assignment = Ternary assignOp Expr  -- assign
+             | Ternary
+
+  assignOp = "=" | "+=" | "-=" | "*="
+
+  Ternary = OrExpr "?" Expr ":" Expr  -- ternary
+          | OrExpr
+
+  // No ?? operator.
+
+  OrExpr = OrExpr "||" AndExpr  -- or
+         | AndExpr
+
+  AndExpr = AndExpr "&&" Equality  -- and
+          | Equality
+
+  // Only ===, !==. No ==, !=. No bitwise &, |.
+  Equality = Equality "===" Comparison  -- eq
+           | Equality "!==" Comparison  -- neq
+           | Comparison
+
+  Comparison = Comparison "<=" Shift   -- lte
+             | Comparison ">=" Shift   -- gte
+             | Comparison "<" ~"<" Shift    -- lt
+             | Comparison ">" ~">" Shift    -- gt
+             | Comparison "instanceof" Shift  -- instanceof
+             | Comparison "in" Shift   -- in
+             | Shift
+
+  Shift = Shift "<<" ~"=" Addition   -- lshift
+        | Shift ">>>" Addition  -- urshift
+        | Addition
+
+  Addition = Addition "+" Multiplication   -- add
+           | Addition "-" Multiplication   -- sub
+           | Multiplication
+
+  Multiplication = Multiplication "*" Exponent  -- mul
+                 | Multiplication "/" Exponent  -- div
+                 | Multiplication "%" Exponent  -- mod
+                 | Exponent
+
+  // No **. Multiplication falls through to Prefix.
+  Exponent = Prefix
+
+  // No ++, --, void, unary +.
+  Prefix = "!" ~"=" Prefix  -- not
+         | "-" ~"-" Prefix  -- neg
+         | "typeof" Prefix  -- typeof
+         | "await" Prefix   -- await
+         | CallMember
+
+  // No ?. optional chaining.
+  CallMember = CallMember "." memberName                          -- member
+             | CallMember "[" Expr "]"                            -- index
+             | CallMember template                                -- tagged
+             | CallMember "(" ListOf<Arg, ","> ","? ")"           -- call
+             | CallMember "!" ~"="                                -- nonnull
+             | CallMember "as" "const"                            -- as_const
+             | CallMember "as" Type                               -- as
+             | Primary
+
+  Arg = "..."? Expr
+
+  // ── Primary ─────────────────────────────────────────
+
+  Primary = number            -- num
+          | string            -- str
+          | template          -- tmpl
+          | regex             -- regex
+          | "true"            -- true
+          | "false"           -- false
+          | "null"            -- null
+          | Arrow             -- arrow
+          | FunctionExpr      -- func
+          | ArrayLiteral      -- array
+          | ObjectLiteral     -- object
+          | Jsx               -- jsx
+          | "new" CallMember  -- new
+          | "import" "." "meta"  -- importmeta
+          | "import" "(" Expr ")"  -- dynamicimport
+          | "(" Expr ")"     -- paren
+          | "yield" Expr?    -- yield
+          | name              -- ident
+
+  Arrow = "async"? ParamList (":" Type)? "=>" (Block | Expr)  -- params
+        | "async"? name "=>" (Block | Expr)                               -- single
+
+  FunctionExpr = "async"? "function" name? ParamList (":" Type)? Block
+
+  // ── Array / Object ──────────────────────────────────
+
+  ArrayLiteral = "[" ListOf<ArrayElement, ","> ","? "]"
+  ArrayElement = "..." Expr  -- spread
+               | Expr        -- elem
+
+  ObjectLiteral = "{" ListOf<Property, ","> ","? "}"
+  Property = "[" Expr "]" ":" Expr                                          -- computed
+           | string ":" Expr                                                 -- string_key
+           | number ":" Expr                                                 -- number_key
+           | "async"? memberName ParamList (":" Type)? Block     -- method
+           | "..." Expr                                                      -- spread
+           | memberName ":" Expr                                             -- named
+           | name                                                            -- shorthand
+
+  // ── Types ───────────────────────────────────────────
+
+  Type = name isKeyword UnionType  -- predicate
+       | UnionType
+
+  isKeyword = "is" ~identChar
+  identChar = alnum | "_" | "$"
+
+  UnionType = "|"? IntersectionType ("|" IntersectionType)*
+
+  IntersectionType = PostfixType ("&" PostfixType)*
+
+  PostfixType = PostfixType "[" Type? "]"                              -- indexed
+              | PostfixType "extends" Type "?" Type ":" Type           -- conditional
+              | PrimaryType
+
+  PrimaryType = "typeof" QualifiedName  -- typeof
+              | "keyof" Type            -- keyof
+              | "readonly" Type         -- readonly
+              | "infer" name            -- infer
+              | TupleType               -- tuple
+              | ObjectType              -- object
+              | FunctionType            -- function
+              | "(" Type ")"           -- paren
+              | template               -- template
+              | "import" "(" string ")" ("." name)*  -- import
+              | "void"      -- void
+              | "never"     -- never
+              | "string"    -- t_string
+              | "number"    -- t_number
+              | "boolean"   -- t_boolean
+              | "bigint"    -- t_bigint
+              | "symbol"    -- t_symbol
+              | "object"    -- t_object
+              | "true"      -- t_true
+              | "false"     -- t_false
+              | "null"      -- t_null
+              | string      -- literal_string
+              | number      -- literal_number
+              | name ("." name)*  -- named
+
+  TupleType = "[" ListOf<TupleElement, ","> "]"
+  TupleElement = (name ":")? "..."? Type
+
+  // No ? on type members.
+  ObjectType = "{" TypeMember* "}"
+  TypeMember = "readonly"? memberName ParamList ":" Type (";" | ",")?  -- method
+             | "readonly"? memberName ":" Type (";" | ",")?                        -- prop
+             | "readonly"? "[" name ":" Type "]" ":" Type (";" | ",")?              -- index
+             | "readonly"? "[" name "in" Type "]" "?"? ":" Type (";" | ",")?       -- mapped
+
+  FunctionType = ParamList "=>" Type
+  QualifiedName = name ("." memberName)*
+
+  // No type parameters or type arguments -- use concrete branded types.
+
+  // ── Bindings ────────────────────────────────────────
+
+  Binding = ObjectPattern  -- object
+          | ArrayPattern   -- array
+          | name           -- name
+
+  ObjectPattern = "{" ListOf<PatternProp, ","> ","? "}"
+  PatternProp = "..." name             -- rest
+              | memberName ":" Binding  -- renamed
+              | name                    -- simple
+
+  ArrayPattern = "[" ListOf<Binding?, ","> "]"
+
+  // ── JSX ─────────────────────────────────────────────
+
+  Jsx = JsxElement | JsxSelfClosing | JsxFragment
+
+  JsxElement = "<" name JsxAttr* ">" JsxChild* "</" name ">"
+  JsxSelfClosing = "<" name JsxAttr* "/>"
+  JsxFragment = "<>" JsxChild* "</>"
+
+  JsxAttr = "{" "..." Expr "}"               -- spread
+          | jsxAttrName "=" string              -- string_val
+          | jsxAttrName "=" "{" Expr "}"        -- expr_val
+          | jsxAttrName                         -- bool
+
+  jsxAttrName = (letter | "_" | "$") (alnum | "_" | "$" | "-")*
+
+  JsxChild = "{" Expr "}"  -- expr
+           | "{" "}"        -- empty
+           | Jsx            -- jsx
+           | jsxText        -- text
+
+  jsxText = (~("{" | "<") any)+
+
+  // ── Tokens ──────────────────────────────────────────
+
+  // memberName allows keywords as property/method names (class, default, etc.)
+  memberName = name | keyword
+  keyword = reserved
+
+  name (an identifier) = ~reserved (letter | "_" | "$") (alnum | "_" | "$")*
+
+  reserved = ("const" | "let" | "function" | "return" | "if" | "else"
+            | "switch" | "case" | "default" | "for"
+            | "break" | "continue" | "throw" | "try" | "catch" | "finally"
+            | "new" | "typeof" | "instanceof"
+            | "export" | "import" | "async"
+            | "await" | "yield" | "declare" | "readonly"
+            | "true" | "false" | "null" | "extends"
+            | "keyof" | "infer" | "class" | "interface"
+            ) ~(alnum | "_" | "$")
+
+  number (a number) = "0" ("x" | "X") (hexDigit | "_")+ "n"?          -- hex
+                    | "0" ("o" | "O") (digit | "_")+ "n"?              -- octal
+                    | "0" ("b" | "B") ("0" | "1" | "_")+ "n"?         -- binary
+                    | digit (digit | "_")* ("." (digit | "_")+)? (("e"|"E") ("+"|"-")? (digit | "_")+)? "n"?  -- decimal
+
+  string (a string) = "\"" stringCharDouble* "\""  -- double
+                    | "'" stringCharSingle* "'"    -- single
+  stringCharDouble = "\\" any  -- escape
+                   | ~"\"" ~"\\" any  -- char
+  stringCharSingle = "\\" any  -- escape
+                   | ~"'" ~"\\" any   -- char
+
+  template (a template literal) = "`" templateChar* "`"
+  templateChar = "\\" any                -- escape
+               | "${" interpBody* "}"    -- interp
+               | "$" ~"{"                -- dollar
+               | ~"`" ~"\\" ~"$" any     -- char
+
+  interpBody = "{" interpBody* "}"  -- braces
+             | template             -- template
+             | ~"}" ~"`" any        -- other
+
+  regex (a regex) = "/" regexChar+ "/" ("g"|"i"|"m"|"s"|"u"|"y")*
+  regexChar = "\\" any                    -- escape
+            | "[" regexClassChar* "]"     -- class
+            | ~"/" ~"\\" ~"[" any         -- char
+  regexClassChar = "\\" any     -- escape
+                 | ~"]" any     -- char
+
+  // Whitespace and comments (automatic in Ohm)
+  space += comment
+  comment = "//" (~"\n" any)*       -- line
+          | "/*" (~"*/" any)* "*/"  -- block
+}

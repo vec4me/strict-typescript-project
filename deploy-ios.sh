@@ -1,7 +1,5 @@
 set -o errexit -o nounset -o pipefail -o noclobber
 
-: "${CONVEX_DEPLOYMENT_PROD:?Missing}"
-
 XCODE_PLIST=$(defaults export com.apple.dt.Xcode - 2>/dev/null || true)
 
 TEAMS=()
@@ -42,8 +40,6 @@ done
 
 security unlock-keychain ~/Library/Keychains/login.keychain-db
 
-export CONVEX_DEPLOYMENT="${CONVEX_DEPLOYMENT_PROD}"
-export CONVEX_URL="https://${CONVEX_DEPLOYMENT_PROD#*:}.convex.cloud"
 npx vite build
 
 rm -rf ios
